@@ -1,8 +1,6 @@
 package com.naushad.IrctcApp.repository;
 
-import com.naushad.IrctcApp.model.Passenger;
-import com.naushad.IrctcApp.model.Ticket;
-import com.naushad.IrctcApp.model.Train;
+import com.naushad.IrctcApp.model.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -15,6 +13,7 @@ public class IrctcRepository {
 
     Map<Date,Map<Integer, List<Passenger>>> bookedSeatByDate = new TreeMap<>();
 
+    // key = pnr and value = corresponding ticket
     Map<String,Ticket> ticketMap = new HashMap<>();
 
     private final double vegPrice = 70;
@@ -36,7 +35,7 @@ public class IrctcRepository {
 
     public Ticket bookTicket(Passenger passenger){
         // First get the map for a particular date
-        Map<Integer, List<Passenger>> passengersTrainMap= bookedSeatByDate.get(passenger.getDateOfTravel());
+        Map<Integer, List<Passenger>> passengersTrainMap= bookedSeatByDate.get(passenger.getDateOfJourney());
         // If there is no booking for a particular date then create a new map for booking of a particular date
         if(passengersTrainMap == null){
             passengersTrainMap = new HashMap<>();
@@ -48,7 +47,7 @@ public class IrctcRepository {
         passengerList.add(passenger);
         passengersTrainMap.put(passenger.getTrainNo(),passengerList);
 
-        bookedSeatByDate.put(passenger.getDateOfTravel(),passengersTrainMap);
+        bookedSeatByDate.put(passenger.getDateOfJourney(),passengersTrainMap);
 
         Ticket ticket = new Ticket();
         ticket.setPassenger(passenger);
@@ -67,9 +66,9 @@ public class IrctcRepository {
     public double calculateFare(Passenger passenger){
         Train train = trainMap.get(passenger.getTrainNo());
         double totalTicketPrice = train.getFare() * passenger.getNoOfSeats();
-        if("Veg".equals(passenger.getFoodType())){
+        if(Constants.FoodType.VEG.equals(passenger.getFoodType())){
             totalTicketPrice += (vegPrice* passenger.getNoOfSeats());
-        } else if ("Non-Veg".equals(passenger.getFoodType())) {
+        } else if (Constants.FoodType.NON_VEG.equals(passenger.getFoodType())) {
             totalTicketPrice += (nonVegPrice* passenger.getNoOfSeats());
         }
         return totalTicketPrice;
@@ -99,4 +98,19 @@ public class IrctcRepository {
     public Ticket checkPnrStatus(String pnr) {
         return ticketMap.get(pnr);
     }
+    public Refund cancelTicket(Ticket ticket) {
+       // ticketMap.remove(passenger.getDateOfJourney(),pnr);
+        ticketMap.remove(ticket.getPNR());
+        Map<Integer, List<Passenger>> trainPassengerMap = bookedSeatByDate.get(ticket.getPassenger().getDateOfJourney());
+        List<Passenger> passengerList = trainPassengerMap.get(ticket.getPassenger().getTrainNo());
+        passengerList.remove(ticket.getPassenger());
+
+        Refund refund = new Refund();
+        refund.setRefundDate(new Date());
+        refund.setTicket(ticket);
+        refund.setDeductedAmount((ticket.getFare() * 12)/100);
+        refund.setRefundedAmount(ticket.getFare() - refund.getDeductedAmount());
+        return refund;
+    }
+
 }

@@ -12,10 +12,10 @@ import java.util.Date;
 public class Passenger {
     private String source;
     private String destination;
-    private Date dateOfTravel;
+    private Date dateOfJourney;
     private int trainNo;
     private PersonalDetail personalDetail;
     private int noOfSeats;
 
-    private String foodType;
+    private Constants.FoodType foodType;
 }
