@@ -1,9 +1,12 @@
 package com.naushad.IrctcApp.repository;
 
 import com.naushad.IrctcApp.model.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+
+
 
 @Repository
 public class IrctcRepository {
@@ -19,21 +22,26 @@ public class IrctcRepository {
     private final double vegPrice = 70;
     private final double nonVegPrice = 100;
 
+    @Value("${establishedYear}")
+    int year;
+
     public IrctcRepository(){
-        trainMap.put(120101, new Train(120101,"Express",180,500));
-        trainMap.put(120102, new Train(120102,"Express",180,500));
-        trainMap.put(120103, new Train(120103,"Express",180,500));
-        trainMap.put(120104, new Train(120104,"Superfast",120,1000));
-        trainMap.put(120105, new Train(120105,"Superfast",120,1000));
-        trainMap.put(120106, new Train(120106,"Superfast",120,1000));
-        trainMap.put(120107, new Train(120107,"Superfast",120,1000));
-        trainMap.put(120108, new Train(120108,"Superfast",120,1000));
-        trainMap.put(120109, new Train(120109,"Rajdhani",100,1500));
-        trainMap.put(120110, new Train(120110,"Rajdhani",100,1500));
+        trainMap.put(120101, new Train(120101, Constants.TrainType.Express, 180, 500));
+        trainMap.put(120102, new Train(120102,Constants.TrainType.Express,180,500));
+        trainMap.put(120103, new Train(120103,Constants.TrainType.Express,180,500));
+        trainMap.put(120104, new Train(120104,Constants.TrainType.Superfast,120,1000));
+        trainMap.put(120105, new Train(120105,Constants.TrainType.Superfast,120,1000));
+        trainMap.put(120106, new Train(120106,Constants.TrainType.Superfast,120,1000));
+        trainMap.put(120107, new Train(120107,Constants.TrainType.Superfast,120,1000));
+        trainMap.put(120108, new Train(120108,Constants.TrainType.Superfast,120,1000));
+        trainMap.put(120109, new Train(120109,Constants.TrainType.Rajdhani,100,1500));
+        trainMap.put(120110, new Train(120110,Constants.TrainType.Rajdhani,100,1500));
     }
 
 
     public Ticket bookTicket(Passenger passenger){
+        System.out.println(year);
+
         // First get the map for a particular date
         Map<Integer, List<Passenger>> passengersTrainMap= bookedSeatByDate.get(passenger.getDateOfJourney());
         // If there is no booking for a particular date then create a new map for booking of a particular date
@@ -99,7 +107,6 @@ public class IrctcRepository {
         return ticketMap.get(pnr);
     }
     public Refund cancelTicket(Ticket ticket) {
-       // ticketMap.remove(passenger.getDateOfJourney(),pnr);
         ticketMap.remove(ticket.getPNR());
         Map<Integer, List<Passenger>> trainPassengerMap = bookedSeatByDate.get(ticket.getPassenger().getDateOfJourney());
         List<Passenger> passengerList = trainPassengerMap.get(ticket.getPassenger().getTrainNo());

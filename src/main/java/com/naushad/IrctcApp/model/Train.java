@@ -3,14 +3,12 @@ package com.naushad.IrctcApp.model;
 
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class Train {
     private int trainNo;
-    private String type;
+    private Constants.TrainType type;
     private int capacity;
     private double fare;
 }

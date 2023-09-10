@@ -4,7 +4,8 @@ public class Constants {
     public enum FoodType {
         VEG, NON_VEG,BOTH
     }
-    public enum Month {
-        JANUARY,FEBRUARY
+    public enum TrainType {
+        Express,Superfast,Rajdhani
     }
+
 }
