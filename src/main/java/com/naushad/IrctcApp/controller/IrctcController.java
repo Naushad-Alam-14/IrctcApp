@@ -2,6 +2,7 @@ package com.naushad.IrctcApp.controller;
 
 
 import com.naushad.IrctcApp.model.Passenger;
+import com.naushad.IrctcApp.model.PersonalDetail;
 import com.naushad.IrctcApp.model.Refund;
 import com.naushad.IrctcApp.model.Ticket;
 import com.naushad.IrctcApp.service.IrctcInterface;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
+
+import java.util.List;
 
 @RestController
 public class IrctcController {
@@ -31,6 +34,12 @@ public class IrctcController {
     @DeleteMapping("/cancelTicket")
     public Refund cancelTicket(@RequestBody String pnr) {
         return irctcInterface.cancelTicket(pnr);
+    }
+
+
+    @GetMapping("/getAll")
+    List<PersonalDetail> findAllPersonalDetails(){
+        return irctcInterface.findAllPersonalDetails();
     }
 
 }

@@ -22,8 +22,6 @@ public class IrctcRepository {
     private final double vegPrice = 70;
     private final double nonVegPrice = 100;
 
-    @Value("${establishedYear}")
-    int year;
 
     public IrctcRepository(){
         trainMap.put(120101, new Train(120101, Constants.TrainType.Express, 180, 500));
@@ -40,7 +38,7 @@ public class IrctcRepository {
 
 
     public Ticket bookTicket(Passenger passenger){
-        System.out.println(year);
+//        System.out.println(year);
 
         // First get the map for a particular date
         Map<Integer, List<Passenger>> passengersTrainMap= bookedSeatByDate.get(passenger.getDateOfJourney());

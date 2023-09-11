@@ -1,23 +1,29 @@
 package com.naushad.IrctcApp.service.impl;
 
 import com.naushad.IrctcApp.model.Passenger;
+import com.naushad.IrctcApp.model.PersonalDetail;
 import com.naushad.IrctcApp.model.Refund;
 import com.naushad.IrctcApp.model.Ticket;
 import com.naushad.IrctcApp.model.exception.ExpiredTicketException;
 import com.naushad.IrctcApp.model.exception.InvalidPNRException;
 import com.naushad.IrctcApp.model.exception.SeatNotFoundException;
+import com.naushad.IrctcApp.repository.IrctcJdbcRepository;
 import com.naushad.IrctcApp.repository.IrctcRepository;
 import com.naushad.IrctcApp.service.IrctcInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class IrctcImpl implements IrctcInterface {
 
     @Autowired
     private IrctcRepository irctcRepository;
+
+    @Autowired
+    private IrctcJdbcRepository irctcJdbcRepository;
 
     @Override
     public Ticket bookTicket(Passenger passenger) {
@@ -51,5 +57,9 @@ public class IrctcImpl implements IrctcInterface {
         }
         return irctcRepository.cancelTicket(ticket);
     }
+    public List<PersonalDetail> findAllPersonalDetails(){
+       return irctcJdbcRepository.findAllPersonalDetails();
+    }
+
 
 }
