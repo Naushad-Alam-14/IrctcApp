@@ -61,5 +61,15 @@ public class IrctcImpl implements IrctcInterface {
        return irctcJdbcRepository.findAllPersonalDetails();
     }
 
+    public PersonalDetail getPersonalDetailByAadhaarNo(String aadhaarNo){
+        return irctcJdbcRepository.getPersonalDetailByAadhaarNo(aadhaarNo);
+    }
 
+    public List<PersonalDetail> findDetailByAge(int age){
+        return irctcJdbcRepository.findDetailByAge(age);
+    }
+
+    public String deleteByAadhaarNo(String aadhaarNo){
+        return irctcJdbcRepository.deleteByAadhaarNo(aadhaarNo);
+    }
 }

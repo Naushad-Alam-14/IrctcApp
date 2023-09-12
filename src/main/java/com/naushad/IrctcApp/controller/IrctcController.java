@@ -42,4 +42,19 @@ public class IrctcController {
         return irctcInterface.findAllPersonalDetails();
     }
 
+    @GetMapping("/getPD/{aadhaarNo}")
+    public PersonalDetail getPersonalDetailByAadhaarNo(@PathVariable String aadhaarNo){
+        return irctcInterface.getPersonalDetailByAadhaarNo(aadhaarNo);
+    }
+
+    @GetMapping("/getByAge/{age}")
+    List<PersonalDetail> findDetailByAge(@PathVariable int age){
+        return irctcInterface.findDetailByAge(age);
+    }
+
+    @DeleteMapping("/delete/{aadhaarNo}")
+    public String deleteByAadhaarNo(@PathVariable String aadhaarNo){
+        return irctcInterface.deleteByAadhaarNo(aadhaarNo);
+    }
+
 }

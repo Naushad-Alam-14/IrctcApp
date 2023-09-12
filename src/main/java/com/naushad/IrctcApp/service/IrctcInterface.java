@@ -14,4 +14,7 @@ public interface IrctcInterface {
     Ticket checkPnrStatus(String pnr);
 
     List<PersonalDetail> findAllPersonalDetails();
+    PersonalDetail getPersonalDetailByAadhaarNo(String aadhaarNo);
+    List<PersonalDetail> findDetailByAge(int age);
+    String deleteByAadhaarNo(String aadhaarNo);
 }
