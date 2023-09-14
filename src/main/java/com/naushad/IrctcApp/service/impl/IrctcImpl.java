@@ -29,10 +29,10 @@ public class IrctcImpl implements IrctcInterface {
     public Ticket bookTicket(Passenger passenger) {
         // 1. Availability
         // 2. yes - book. No - SeatNotAvailable
-        boolean isSeatAvailable = irctcRepository.checkSeatIsAvailable(passenger.getTrainNo(),
+        boolean isSeatAvailable = irctcJdbcRepository.checkSeatIsAvailable(passenger.getTrainNo(),
                 passenger.getNoOfSeats(),passenger.getDateOfJourney());
         if(!isSeatAvailable){
-            // throw seatNotavailable exception
+            // throw seatNotAvailable exception
             throw new SeatNotFoundException("Seat is not available");
         }
         return irctcRepository.bookTicket(passenger);
@@ -71,5 +71,8 @@ public class IrctcImpl implements IrctcInterface {
 
     public String deleteByAadhaarNo(String aadhaarNo){
         return irctcJdbcRepository.deleteByAadhaarNo(aadhaarNo);
+    }
+    public int countAllBookingByDateAndTrainNo(Date dateOfJourney,int trainNo){
+        return irctcJdbcRepository.countAllBookingByDateAndTrainNo(dateOfJourney,trainNo);
     }
 }

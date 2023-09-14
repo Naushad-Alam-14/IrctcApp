@@ -12,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -55,6 +58,12 @@ public class IrctcController {
     @DeleteMapping("/delete/{aadhaarNo}")
     public String deleteByAadhaarNo(@PathVariable String aadhaarNo){
         return irctcInterface.deleteByAadhaarNo(aadhaarNo);
+    }
+
+    @GetMapping("/count")
+    public int countAllBookingByDateAndTrainNo(@RequestParam String dateOfJourney,@RequestParam int trainNo) throws ParseException {
+        Date date=new SimpleDateFormat("dd-MM-yyyy").parse(dateOfJourney);
+        return irctcInterface.countAllBookingByDateAndTrainNo(date,trainNo);
     }
 
 }

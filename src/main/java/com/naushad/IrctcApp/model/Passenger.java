@@ -10,6 +10,7 @@ import java.util.Date;
 @AllArgsConstructor
 @ToString
 public class Passenger {
+    private int id;
     private String source;
     private String destination;
     private Date dateOfJourney;

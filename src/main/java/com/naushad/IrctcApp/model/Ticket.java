@@ -9,6 +9,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Ticket {
+    int id;
     private Passenger passenger;
     private double fare;
     private String PNR;
