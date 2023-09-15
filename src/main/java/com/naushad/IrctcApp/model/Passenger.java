@@ -2,6 +2,7 @@ package com.naushad.IrctcApp.model;
 
 import lombok.*;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Getter
@@ -17,6 +18,7 @@ public class Passenger {
     private int trainNo;
     private PersonalDetail personalDetail;
     private int noOfSeats;
+    private Timestamp createdAt;
 
     private Constants.FoodType foodType;
 }

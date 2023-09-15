@@ -19,6 +19,4 @@ public interface IrctcInterface {
     List<PersonalDetail> findDetailByAge(int age);
     String deleteByAadhaarNo(String aadhaarNo);
 
-    int countAllBookingByDateAndTrainNo(Date dateOfJourney, int trainNo);
-
 }

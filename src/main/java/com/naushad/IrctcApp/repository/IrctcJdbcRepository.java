@@ -1,12 +1,17 @@
 package com.naushad.IrctcApp.repository;
 
 import com.naushad.IrctcApp.model.*;
+import com.naushad.IrctcApp.model.exception.BookingFailedException;
+import com.naushad.IrctcApp.model.exception.PassengerNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Repository
@@ -34,7 +39,13 @@ public class IrctcJdbcRepository {
 
         String query = "select * from personalDetail where aadhaarNo=" + "'" + aadhaarNo + "'";
 //        Object[] parameters = new Object[]{aadhaarNo};
-        return jdbcTemplate.queryForObject(query, new BeanPropertyRowMapper<>(PersonalDetail.class));
+        PersonalDetail personalDetail = null;
+        try{
+            personalDetail = jdbcTemplate.queryForObject(query, new BeanPropertyRowMapper<>(PersonalDetail.class));
+        }catch (DataAccessException dataAccessException){
+            System.out.println("Didn't find any personal detail for aadhaarNo -" + aadhaarNo);
+        }
+        return personalDetail;
     }
 
     public String deleteByAadhaarNo(String aadhaarNo){
@@ -47,35 +58,61 @@ public class IrctcJdbcRepository {
     }
 
     public Ticket bookTicket(Passenger passenger){
-        PersonalDetail personalDetail = passenger.getPersonalDetail();
-        boolean isAlreadyRegistered = alreadyRegistered(personalDetail);
+        /* Check person is already added in DB or not */
+        boolean isAlreadyRegistered = alreadyRegistered(passenger.getPersonalDetail());
         boolean insertedPersonalDetail = true;
+
+        /* If person is not added, add it in a DB */
         if(!isAlreadyRegistered){
-            insertedPersonalDetail = insertPersonalDetail(personalDetail);
+            insertedPersonalDetail = insertPersonalDetail(passenger.getPersonalDetail());
         }
-        boolean insertedPassenger;
-        boolean success = false;
         Ticket ticket = null;
+        /* If personal detail has been inserted, Insert passenger */
         if(insertedPersonalDetail){
-            insertedPassenger = insertPassengerDetail(passenger);
-            if(insertedPassenger){
-                int passengerId = getPassengerId();
-                passenger.setId(passengerId);
-                ticket = new Ticket();
-                ticket.setPassenger(passenger);
-                ticket.setBookingDate(new Date());
-                ticket.setFare(calculateFare(passenger));
-                ticket.setPNR(generatePNR());
-                success = insertTicket(ticket);
+            passenger.setCreatedAt(new Timestamp(new Date().getTime()));
+            /* If passenger has been inserted, insert ticket */
+            if(insertPassengerDetail(passenger)){
+                passenger.setId(getPassengerId(passenger));
+                ticket = generateTicket(passenger);
+                /* If ticket is not generated, throw an exception */
+                if(!insertTicket(ticket))
+                    throw new BookingFailedException("Not able to book ticket");
             }
         }
-        if(!success)
-            throw new RuntimeException("Not able to book ticket");
         return ticket;
     }
 
-    private int getPassengerId() {
-        return 0;
+    private Ticket generateTicket(Passenger passenger){
+        Ticket ticket = new Ticket();
+        ticket.setPassenger(passenger);
+        ticket.setBookingDate(new Date());
+        ticket.setFare(calculateFare(passenger));
+        ticket.setPNR(generatePNR());
+        return ticket;
+    }
+
+    private int getPassengerId(Passenger passenger) {
+        String query1 = "select id from Passenger where date(dateOfJourney) = date(?)" +
+                " and trainNo = ? and aadhaarNo = ? and createdAt between ? and ?";
+
+        String s = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(passenger.getCreatedAt());
+
+        Object[] parameters = new Object[]{
+                passenger.getDateOfJourney(),passenger.getTrainNo(),
+                passenger.getPersonalDetail().getAadhaarNo(),s,getTimeAfter(passenger.getCreatedAt(),5)
+        };
+        Integer id = jdbcTemplate.queryForObject(query1,Integer.class,parameters);
+        if(id == null){
+            throw new PassengerNotFoundException("Passenger is not available");
+        }
+        return id;
+    }
+    private String getTimeAfter(Timestamp timestamp,int sec){
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(timestamp.getTime());
+        cal.add(Calendar.SECOND, sec);
+        Timestamp newTimeStamp =  new Timestamp(cal.getTime().getTime());
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(newTimeStamp);
     }
 
     private boolean insertTicket(Ticket ticket){
@@ -84,26 +121,31 @@ public class IrctcJdbcRepository {
         Object[] parameters = new Object[]{
                 ticket.getFare(),ticket.getPNR(),ticket.getBookingDate(),ticket.getPassenger().getId()
         };
-        return jdbcTemplate.update(query,parameters,Integer.class) >= 0;
+        return jdbcTemplate.update(query,parameters) >= 0;
     }
 
     private boolean insertPassengerDetail(Passenger passenger){
-        String query = "insert into Passenger(source,destination,dateOfJourney,trainNo,noOfSeats,foodType,aadhaarNo) " +
-                "values(?,?,?,?,?,?,?)";
+        String query = "insert into Passenger(source,destination,dateOfJourney,trainNo,noOfSeats,foodType,aadhaarNo,createdAt) " +
+                "values(?,?,?,?,?,?,?,?)";
         Object[] parameters = new Object[]{
                 passenger.getSource(),passenger.getDestination(),passenger.getDateOfJourney(),passenger.getTrainNo(),
-                passenger.getNoOfSeats(),passenger.getFoodType(),passenger.getPersonalDetail().getAadhaarNo()
+                passenger.getNoOfSeats(),passenger.getFoodType().name(),passenger.getPersonalDetail().getAadhaarNo(),
+                passenger.getCreatedAt()
         };
-        return jdbcTemplate.update(query,parameters,Integer.class) >= 0;
+        return jdbcTemplate.update(query,parameters) >= 0;
     }
 
     private boolean insertPersonalDetail(PersonalDetail personalDetail){
-
         String query = "Insert into personaldetail(name,aadhaarNo,age,mobileNo) values(?,?,?,?)";
+
+       /* String query = "Insert into personaldetail(name,aadhaarNo,age,mobileNo) values(" +
+                "'"+  personalDetail.getName() + "'," +"'"+  personalDetail.getAadhaarNo() + "',"
+                + personalDetail.getAge() + ",'"+  personalDetail.getMobileNo() + "'" +
+                ")";*/
         Object[] parameter = new Object[]{
                 personalDetail.getName(),personalDetail.getAadhaarNo(),personalDetail.getAge(),personalDetail.getMobileNo()
         };
-        int count = jdbcTemplate.update(query,parameter,Integer.class);
+        int count = jdbcTemplate.update(query,parameter);
         return count > 0;
     }
 
@@ -129,7 +171,10 @@ public class IrctcJdbcRepository {
     public int countAllBookingByDateAndTrainNo(Date dateOfJourney,int trainNo){
         String query = "select sum(noOfSeats) from Passenger where dateOfJourney =? and trainNo =?";
         Object[] parameters = new Object[]{dateOfJourney,trainNo};
-        return jdbcTemplate.queryForObject(query,parameters,Integer.class);
+        Integer count = jdbcTemplate.queryForObject(query,parameters,Integer.class);
+        if(count == null)
+            return 0;
+        return count;
     }
 
     public Train getTrainByTrainNo(int trainNo){

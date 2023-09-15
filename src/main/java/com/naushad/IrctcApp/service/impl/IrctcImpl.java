@@ -35,7 +35,7 @@ public class IrctcImpl implements IrctcInterface {
             // throw seatNotAvailable exception
             throw new SeatNotFoundException("Seat is not available");
         }
-        return irctcRepository.bookTicket(passenger);
+        return irctcJdbcRepository.bookTicket(passenger);
     }
 
     public Ticket checkPnrStatus(String pnr) {
@@ -71,8 +71,5 @@ public class IrctcImpl implements IrctcInterface {
 
     public String deleteByAadhaarNo(String aadhaarNo){
         return irctcJdbcRepository.deleteByAadhaarNo(aadhaarNo);
-    }
-    public int countAllBookingByDateAndTrainNo(Date dateOfJourney,int trainNo){
-        return irctcJdbcRepository.countAllBookingByDateAndTrainNo(dateOfJourney,trainNo);
     }
 }

@@ -60,10 +60,4 @@ public class IrctcController {
         return irctcInterface.deleteByAadhaarNo(aadhaarNo);
     }
 
-    @GetMapping("/count")
-    public int countAllBookingByDateAndTrainNo(@RequestParam String dateOfJourney,@RequestParam int trainNo) throws ParseException {
-        Date date=new SimpleDateFormat("dd-MM-yyyy").parse(dateOfJourney);
-        return irctcInterface.countAllBookingByDateAndTrainNo(date,trainNo);
-    }
-
 }
