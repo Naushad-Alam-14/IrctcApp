@@ -25,6 +25,8 @@ public class IrctcJdbcRepository {
     @Value("${nonVegPrice}")
     private double nonVegPrice;
 
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     public List<PersonalDetail> findAllPersonalDetails() {
         return jdbcTemplate.query("select * from personalDetail", new BeanPropertyRowMapper<>(PersonalDetail.class));
     }
@@ -92,16 +94,17 @@ public class IrctcJdbcRepository {
     }
 
     private int getPassengerId(Passenger passenger) {
-        String query1 = "select id from Passenger where date(dateOfJourney) = date(?)" +
+        String query = "select id from Passenger where date(dateOfJourney) = date(?)" +
                 " and trainNo = ? and aadhaarNo = ? and createdAt between ? and ?";
 
-        String s = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(passenger.getCreatedAt());
+        String formattedCreatedAt = simpleDateFormat.format(passenger.getCreatedAt());
 
         Object[] parameters = new Object[]{
                 passenger.getDateOfJourney(),passenger.getTrainNo(),
-                passenger.getPersonalDetail().getAadhaarNo(),s,getTimeAfter(passenger.getCreatedAt(),5)
+                passenger.getPersonalDetail().getAadhaarNo(),
+                formattedCreatedAt,getTimeAfter(passenger.getCreatedAt(),5)
         };
-        Integer id = jdbcTemplate.queryForObject(query1,Integer.class,parameters);
+        Integer id = jdbcTemplate.queryForObject(query,Integer.class,parameters);
         if(id == null){
             throw new PassengerNotFoundException("Passenger is not available");
         }
@@ -112,7 +115,7 @@ public class IrctcJdbcRepository {
         cal.setTimeInMillis(timestamp.getTime());
         cal.add(Calendar.SECOND, sec);
         Timestamp newTimeStamp =  new Timestamp(cal.getTime().getTime());
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(newTimeStamp);
+        return simpleDateFormat.format(newTimeStamp);
     }
 
     private boolean insertTicket(Ticket ticket){
