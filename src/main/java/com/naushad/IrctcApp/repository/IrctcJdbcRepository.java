@@ -198,7 +198,16 @@ public class IrctcJdbcRepository {
     }
 
     public String generatePNR(){
+
         return (new Random().nextInt(1000)) + "";
     }
+
+    public List<Passenger> getAllPassengerByTrainNo(int trainNo){
+        String query= "select * from passenger where trainNo=?";
+        Object[] obj = new Object[]{trainNo};
+         return jdbcTemplate.query(query,obj,new BeanPropertyRowMapper<>(Passenger.class));
+
+    }
+
 
 }

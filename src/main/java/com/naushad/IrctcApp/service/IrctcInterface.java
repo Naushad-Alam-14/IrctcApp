@@ -7,6 +7,7 @@ import com.naushad.IrctcApp.model.Ticket;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface IrctcInterface {
 
@@ -18,5 +19,6 @@ public interface IrctcInterface {
     PersonalDetail getPersonalDetailByAadhaarNo(String aadhaarNo);
     List<PersonalDetail> findDetailByAge(int age);
     String deleteByAadhaarNo(String aadhaarNo);
+    Map<Date,List<Passenger>> getAllPassengerByTrainNo(int trainNo);
 
 }

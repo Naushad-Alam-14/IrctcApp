@@ -16,6 +16,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class IrctcController {
@@ -58,6 +59,10 @@ public class IrctcController {
     @DeleteMapping("/delete/{aadhaarNo}")
     public String deleteByAadhaarNo(@PathVariable String aadhaarNo){
         return irctcInterface.deleteByAadhaarNo(aadhaarNo);
+    }
+    @GetMapping("/getAllPassenger/{trainNo}")
+    public Map<Date,List<Passenger>> getAllPassengerByTrainNo(@PathVariable int trainNo){
+        return irctcInterface.getAllPassengerByTrainNo(trainNo);
     }
 
 }

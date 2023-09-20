@@ -13,8 +13,7 @@ import com.naushad.IrctcApp.service.IrctcInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class IrctcImpl implements IrctcInterface {
@@ -71,5 +70,24 @@ public class IrctcImpl implements IrctcInterface {
 
     public String deleteByAadhaarNo(String aadhaarNo){
         return irctcJdbcRepository.deleteByAadhaarNo(aadhaarNo);
+    }
+
+    @Override
+    public Map<Date, List<Passenger>> getAllPassengerByTrainNo(int trainNo) {
+        Map<Date,List<Passenger>> passengerDateMap=new HashMap<>();
+        List<Passenger> passengerList= irctcJdbcRepository.getAllPassengerByTrainNo(trainNo);
+        for(Passenger passenger:passengerList) {
+            List<Passenger> listOfPassenger;
+            if (passengerDateMap.containsKey(passenger.getDateOfJourney())) {
+                listOfPassenger =passengerDateMap.get(passenger.getDateOfJourney());
+
+            } else {
+                 listOfPassenger = new ArrayList<>();
+
+            }
+            listOfPassenger.add(passenger);
+            passengerDateMap.put(passenger.getDateOfJourney(), listOfPassenger);
+        }
+        return  passengerDateMap;
     }
 }
