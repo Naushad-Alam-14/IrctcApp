@@ -208,6 +208,13 @@ public class IrctcJdbcRepository {
          return jdbcTemplate.query(query,obj,new BeanPropertyRowMapper<>(Passenger.class));
 
     }
+    public List<Passenger> getAllPassenger(Date startDate,Date endDate){
+        String query = "select * from passenger where DateOfJourney between ? and ?";
+        Object[] param = new Object[]{startDate,endDate};
+        return jdbcTemplate.query(query,param,new BeanPropertyRowMapper<>(Passenger.class));
+
+
+    }
 
 
 }

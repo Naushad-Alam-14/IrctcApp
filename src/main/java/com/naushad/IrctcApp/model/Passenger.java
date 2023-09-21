@@ -21,4 +21,5 @@ public class Passenger {
     private Timestamp createdAt;
 
     private Constants.FoodType foodType;
+    private String aadhaarNo;
 }

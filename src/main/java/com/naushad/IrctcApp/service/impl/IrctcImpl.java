@@ -90,4 +90,13 @@ public class IrctcImpl implements IrctcInterface {
         }
         return  passengerDateMap;
     }
+    public List<Passenger> getAllPassenger(Date startDate, Date endDate){
+        List<Passenger> passengerList = irctcJdbcRepository.getAllPassenger(startDate,endDate);
+
+        for (Passenger passenger:passengerList) {
+            passenger.setPersonalDetail(irctcJdbcRepository.getPersonalDetailByAadhaarNo(passenger.getAadhaarNo()));
+        }
+        return passengerList;
+
+    }
 }

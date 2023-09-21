@@ -60,9 +60,17 @@ public class IrctcController {
     public String deleteByAadhaarNo(@PathVariable String aadhaarNo){
         return irctcInterface.deleteByAadhaarNo(aadhaarNo);
     }
-    @GetMapping("/getAllPassenger/{trainNo}")
+    @GetMapping("/getAllPassengerByTrainNo/{trainNo}")
     public Map<Date,List<Passenger>> getAllPassengerByTrainNo(@PathVariable int trainNo){
         return irctcInterface.getAllPassengerByTrainNo(trainNo);
     }
+    @GetMapping("/getAllPassenger")
+    public List<Passenger> getAllPassenger(@RequestParam String startDate,@RequestParam String endDate) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+
+        return irctcInterface.getAllPassenger(simpleDateFormat.parse(startDate),simpleDateFormat.parse(endDate));
+    }
+
 
 }

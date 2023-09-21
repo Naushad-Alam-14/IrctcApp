@@ -21,4 +21,6 @@ public interface IrctcInterface {
     String deleteByAadhaarNo(String aadhaarNo);
     Map<Date,List<Passenger>> getAllPassengerByTrainNo(int trainNo);
 
+
+    List<Passenger> getAllPassenger(Date startDate, Date endDate);
 }
